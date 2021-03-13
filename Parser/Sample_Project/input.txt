@@ -1,0 +1,3 @@
+"Course 1"	22331	40/45
+"Another one"	78	50/50
+"Course_23"	902		2/30

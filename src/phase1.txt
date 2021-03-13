@@ -1,0 +1,160 @@
+%option noyywrap
+%{
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <string.h>
+
+  FILE *fout;
+  char symbol_table[10000][50];
+  int row_in_table(char wrd[]);
+   
+%}
+Er1 ((#)[+-]?(0)[0-9]+)|((#)[+-}?[0-9]+\.[0-9]+(0))
+Er2 (#)+[-+]?([0-9]*|([0-9]+\.[0-9]+))((#)+[-+]?([0-9]*|([0-9]+\.[0-9]+)))+
+Er3 [a-zA-Z][a-zA-Z0-9]*(#)+[-+]?([0-9]*|([0-9]+\.[0-9]+))
+Er4 (#)+[-+]?([0-9]*|([0-9]+\.[0-9]+))(#)*[a-zA-Z][a-zA-Z0-9]*
+Er5 (((#)+[-+]?[0-9]*[a-zA-Z][a-zA-Z0-9]*)((#)+[-+]?([0-9]*|([0-9]+\.[0-9]+)))?)+
+Er6  [a-zA-Z][a-zA-Z][a-zA-Z0-9]*
+Real  (#)[-+]?((0)|([1-9][0-9]*))*\.((0)|([0-9]*[1-9]))([eE][-+]?(0)|([1-9][0-9]*))?
+INT  (#)[-+]?((0)|([1-9][0-9]*))
+RPAR  [)]   
+LPAR  [(]   
+Assign  (:=)  
+SEMI  [;]
+COLON  [:]   
+COMMA  [,]   
+LT  ".LT."
+GT  ".GT."
+LE  ".LE."
+GE  ".GE."
+EQ  ".EQ."
+NE  ".NE."
+MUL  [*]
+PLUS  [+]
+MINUS  [-]
+DIV  [/]
+Bool  (Bool)   
+Intkw (Int)
+Realkw (Real)
+Program  (Program)
+Procedure  (Procedure)
+Function (Function)
+Begin  (Begin)
+End  (End)
+If  (If)
+True (True)
+False (False)
+Then  (Then)
+Else  (Else)
+While  (While)
+Do  (Do)
+For_KW  (For)
+To  (To)   
+Downto  (Downto)   
+Case (Case)  
+Return  (Return)   
+AndThen  "And Then"   
+OrElse  "Or Else"
+ID  [a-zA-Z][0-9][a-zA-Z0-9]*
+
+
+%%
+[ \t\n] ;
+{Er1} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tERROR\t-\n");}
+{Er2} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tERROR\t-\n");}
+{Er3} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tERROR\t-\n");}
+{Er4} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tERROR\t-\n");}
+{Er5} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tERROR\t-\n");}
+{Then} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tThen\t-\n");}
+{Else} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tElse\t-\n");}
+{While} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tWHILE\t-\n");}
+{True} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tTRUE\t-\n");}
+{False} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tFALSE\t-\n");}
+{Do} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tDO\t-\n");}
+{For_KW} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tFOR\t-\n");}
+{To} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tTO\t-\n");}
+{Downto} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tDOWNTO\t-\n");}
+{Case} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tCASE\t-\n");}
+{Return} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tRETURN\t-\n");}
+{If} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tIf\t-\n");}
+{SEMI} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t;\t-\n");}
+{OrElse} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tOR ElLSE\t-\n");}
+{INT} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tInt\t");fprintf(fout, "%d\n", row_in_table(yytext));}
+{LT} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t.LT.\t-\n");}
+{LE} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t.LE.\t-\n");}
+{EQ} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t.EQ.\t-\n");}
+{NE} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t.NE.\t-\n");}
+{GT} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t.GT.\t-\n");}
+{GE} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t.GE.\t-\n");}
+{DIV} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t/\t-\n");}
+{MUL} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t*\t-\n");}
+{AndThen} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tAND THEN\t-\n");}
+{RPAR} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t)\t-\n");}
+{LPAR} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t(\t-\n");}
+{Assign} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t:=\t-\n");}
+{COLON} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t:\t-\n");}
+{COMMA} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t,\t-\n");}
+{Real} {fprintf(fout, "\t%s\t", yytext);fprintf(fout, "\tReal\t");fprintf(fout, "%d\n", row_in_table(yytext));}
+{PLUS} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t+\t-\n");}
+{MINUS} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\t-\t-\n");}
+{Bool} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tBOOL\t-\n");}
+{Realkw} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tREAL\t-\n");}
+{Intkw} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tINT\t-\n");}
+{Program} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tPROGRAM\t-\n");}
+{Procedure} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tPROCEDURE\t-\n");}
+{Function} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tFUNCTION\t-\n");}
+{Begin} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tBEGIN\t-\n");}
+{End} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tEND\t-\n");}
+{ID} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tID\t");fprintf(fout, "%d\n", row_in_table(yytext));}
+{Er6} {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tERROR\t-\n");}
+. {fprintf(fout, "\t%s\t", yytext); fprintf(fout, "\tERROR\t-\n");}
+%%
+#include <stdio.h>
+#include <stdlib.h>
+
+
+int main(int argc, char *argv[]) {
+  int i=0;
+  for(i=0;i<10000;i++){
+    symbol_table[i][0]='#';
+    }
+ 
+  yyin = fopen("input3.txt", "r");  
+  fout = fopen("output3.txt", "w");
+
+  fprintf(fout, "\tLexeme\t\tToken\trow_no in symbol_table\n\n");
+  if(yyin) {  
+    yylex();
+    fclose(yyin);
+  }
+
+
+   
+  fclose(fout);
+  return 0;
+}
+int row_in_table(char wrd[])
+{
+  int i;
+  int entry=-1;
+  char tmp[50];
+  for(i=0;i <1000 && entry == -1;i++){
+    int c;
+    for(c=0;c<50;c++){
+      tmp[c] =symbol_table[i][c]; 
+      }
+    int ifeq = strcmp(tmp,wrd);
+    if(ifeq==0){
+      return i;
+      }
+    if(tmp[0]=='#'){
+      entry = i;
+      }
+  }
+  
+  int l;
+    for(l=0;l<50;l++){
+      symbol_table[entry][l]=wrd[l] ;
+      }
+  return entry;
+}
